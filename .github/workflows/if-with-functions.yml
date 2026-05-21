@@ -7,6 +7,7 @@ jobs:
                 -feature/**
     quality_check:
         if: startswith(github.ref_name,'feature') && github.event_name == 'push'
+        runs_on: ubuntu-latest
         steps:
             -name: perform code quality
              run: echo "performing quality checks"
@@ -33,7 +34,7 @@ jobs:
              run: echo "success email sent to team"  
     failure_notify:
         needs:['quality_check','dev_deploy','prod_deploy']
-        if:failure()
+        if: failure()
         runs_on: ubuntu-latest
         steps:
             -name: notify failure
