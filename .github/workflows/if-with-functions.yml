@@ -1,41 +1,44 @@
+name: multi environment deployment
+
+on:
+  push:
+    branches:
+        -main
+        -develop
+        -feature/**
 jobs:
-    on:
-        push:
-            branches:
-                -main
-                -develop
-                -feature/**
+
     quality_check:
         if: startswith(github.ref_name,'feature') && github.event_name == 'push'
-        runs_on: ubuntu-latest
+        runs-on: ubuntu-latest
         steps:
-            -name: perform code quality
-             run: echo "performing quality checks"
+            - name: perform code quality
+              run: echo "performing quality checks"
 
     dev_deploy:
-         if: github.ref-name == 'develop' && github.event_name == 'push'
-         runs_on: ubuntu-latest
+         if: github.ref_name == 'develop' && github.event_name == 'push'
+         runs-on: ubuntu-latest
         steps:
-            -name: dev deploy
-             run: echo "deploy the code to devlopment env"
+            - name: dev deploy
+              run: echo "deploy the code to devlopment env"
 
     prod_deploy:
         if: github.ref-name == 'main' && github.event_name == 'push'
-        runs_on: ubuntu-latest
+        runs-on: ubuntu-latest
         steps:
-            -name: prod deploy
-             run: echo "deploy the code to production env"
+            - name: prod deploy
+              run: echo "deploy the code to production env"
     success_notify:
-        needs:['quality_check','dev_deploy','prod_deploy']
+        needs: ['quality_check','dev_deploy','prod_deploy']
         if: always() && !failure()
-        runs_on: ubuntu-latest
+        runs-on: ubuntu-latest
         steps:
-            -name: notify success
-             run: echo "success email sent to team"  
+            - name: notify success
+              run: echo "success email sent to team"  
     failure_notify:
-        needs:['quality_check','dev_deploy','prod_deploy']
+        needs: ['quality_check','dev_deploy','prod_deploy']
         if: failure()
-        runs_on: ubuntu-latest
+        runs-on: ubuntu-latest
         steps:
-            -name: notify failure
-             run: echo "failure email sent to team"                 
+            - name: notify failure
+              run: echo "failure email sent to team"                 
