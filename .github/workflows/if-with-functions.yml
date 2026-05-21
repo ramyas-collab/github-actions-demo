@@ -1,40 +1,59 @@
+name: Multi Environment Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**
+
 jobs:
-    on:
-        push:
-            branches:
-                -main
-                -develop
-                -feature/**
-    quality_check:
-        if: startswith(github.ref_name,'feature') && github.event_name == 'push'
-        steps:
-            -name: perform code quality
-             run: echo "performing quality checks"
 
-    dev_deploy:
-         if: github.ref-name == 'develop' && github.event_name == 'push'
-         runs_on: ubuntu-latest
-        steps:
-            -name: dev deploy
-             run: echo "deploy the code to devlopment env"
+  quality_check:
+    if: startsWith(github.ref_name, 'feature') && github.event_name == 'push'
 
-    prod_deploy:
-        if: github.ref-name == 'main' && github.event_name == 'push'
-        runs_on: ubuntu-latest
-        steps:
-            -name: prod deploy
-             run: echo "deploy the code to production env"
-    success_notify:
-        needs:['quality_check','dev_deploy','prod_deploy']
-        if: always() && !failure()
-        runs_on: ubuntu-latest
-        steps:
-            -name: notify success
-             run: echo "success email sent to team"  
-    failure_notify:
-        needs:['quality_check','dev_deploy','prod_deploy']
-        if:failure()
-        runs_on: ubuntu-latest
-        steps:
-            -name: notify failure
-             run: echo "failure email sent to team"                 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: perform code quality
+        run: echo "performing quality checks"
+
+  dev_deploy:
+    if: github.ref_name == 'develop' && github.event_name == 'push'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: dev deploy
+        run: echo "deploy the code to development env"
+
+  prod_deploy:
+    if: github.ref_name == 'main' && github.event_name == 'push'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: prod deploy
+        run: echo "deploy the code to production env"
+
+  success_notify:
+    needs: [quality_check, dev_deploy, prod_deploy]
+
+    if: always() && !failure()
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: notify success
+        run: echo "success email sent to team"
+
+  failure_notify:
+    needs: [quality_check, dev_deploy, prod_deploy]
+
+    if: failure()
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: notify failure
+        run: echo "failure email sent to team"
