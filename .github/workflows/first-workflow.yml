@@ -1,4 +1,4 @@
-name: Workflow A
+name: First Workflow
 
 on:
   push:
@@ -17,59 +17,52 @@ jobs:
       - name: Run build
         run: echo "Building..."
 
-      - name: Trigger Workflow B
+      - name: Trigger Second Workflow
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          event-type: run-workflow-b
+          event-type: run-second-workflow
           client-payload: '{"ref": "${{ github.ref }}"}'
 
-      - name: Wait for Workflow B to complete
+      - name: Wait for Second Workflow to complete
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Waiting for Workflow B to start..."
+          echo "Waiting for Second Workflow to start..."
           sleep 10
-
           REPO="${{ github.repository }}"
           TIMEOUT=300
           ELAPSED=0
-
           while true; do
             STATUS=$(gh run list \
               --repo "$REPO" \
-              --workflow "workflow-b.yml" \
+              --workflow "second-workflow.yml" \
               --limit 1 \
               --json status,conclusion \
               --jq '.[0].status')
-
             CONCLUSION=$(gh run list \
               --repo "$REPO" \
-              --workflow "workflow-b.yml" \
+              --workflow "second-workflow.yml" \
               --limit 1 \
               --json status,conclusion \
               --jq '.[0].conclusion')
-
-            echo "Workflow B status: $STATUS | conclusion: $CONCLUSION"
-
+            echo "Second Workflow status: $STATUS | conclusion: $CONCLUSION"
             if [ "$STATUS" = "completed" ]; then
               if [ "$CONCLUSION" = "success" ]; then
-                echo "Workflow B completed successfully!"
+                echo "Second Workflow completed successfully!"
                 exit 0
               else
-                echo "Workflow B failed with conclusion: $CONCLUSION"
+                echo "Second Workflow failed!"
                 exit 1
               fi
             fi
-
             if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
-              echo "Timed out waiting for Workflow B"
+              echo "Timed out!"
               exit 1
             fi
-
             sleep 15
             ELAPSED=$((ELAPSED + 15))
           done
 
-      - name: Continue after B is done
-        run: echo "Both workflows completed!"
+      - name: Continue after Second Workflow
+        run: echo "Both workflows done!"
