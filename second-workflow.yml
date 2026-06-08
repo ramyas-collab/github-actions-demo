@@ -1,0 +1,16 @@
+name: second-workflow
+
+on:
+  repository_dispatch:
+    types: [run-second-workflow]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read data from A
+        run: echo "Ref is ${{ github.event.client_payload.ref }}"
+
+      - name: Deploy
+        run: echo "Deploying..."       

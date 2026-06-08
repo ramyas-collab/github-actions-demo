@@ -19,3 +19,9 @@ jobs:
 
       - name: List Files
         run: ls -la
+      - name: Trigger Workflow B
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: run-second-workflow
+          client-payload: '{"ref": "${{ github.ref }}"}'  
